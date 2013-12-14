@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<project name="VisualYUICompressor" default="jar" basedir=".">
+	<property file="build.properties" />
+	<property environment="env"/>
+
+	<path id="base.classpath">
+		<fileset dir="${lib.dir}" includes="*.jar" />
+		<pathelement location="${java.dist.dir}" />
+	</path>
+
+	<target name="clean">
+		<delete failonerror="false">
+			<fileset dir = "${dist.dir}"/>
+		</delete>
+	</target>
+	
+	<target name="prepare">
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${java.dist.dir}" />
+		<mkdir dir="${java.dist.dir}/META-INF" />
+	</target>
+
+	<target name="compile-java" depends="clean, prepare">
+		<javac 
+			srcdir="${src.dir}"
+			destdir="${java.dist.dir}"
+			classpathref = "base.classpath"
+			debug="${javac.debug}" 
+			target="${javac.target}"
+			deprecation="${javac.deprecation}" 
+			optimize="${javac.optimize}"
+			excludes="${javac.excludes}" >		
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile-java">
+		<unjar src="${lib.dir}/yuicompressor-2.4.8.jar" dest="${java.dist.dir}">
+			<patternset>
+				<exclude name="META-INF"/>
+				<exclude name="conf"/>
+			</patternset>	   
+		</unjar>
+		<unjar src="${lib.dir}/seaglasslookandfeel-0.2.jar" dest="${java.dist.dir}">
+			<patternset>
+				<exclude name="META-INF"/>
+				<exclude name="conf"/>
+			</patternset>	   
+		</unjar>
+		<unjar src="${lib.dir}/TableLayout.jar" dest="${java.dist.dir}">
+			<patternset>
+				<exclude name="META-INF"/>
+				<exclude name="conf"/>
+			</patternset>	   
+		</unjar>
+		<jar jarfile="${project.name}-${project.version}.jar">
+			<fileset dir="${java.dist.dir}">
+				<include name="**/*" />
+			</fileset>
+			<manifest>
+				<attribute name="Manifest-Version" value="1.0"/>
+				<attribute name="Main-Class" value="cn.com.visualyuicompressor.Main"/>
+				<attribute name="Built-By" value="wangzhengbo"/>
+				<attribute name="Email" value="zhengbowang1984@gmail.com"/>
+			</manifest>
+		</jar>
+		<jar jarfile="${project.name}-${project.version}-all.jar">
+			<fileset dir=".">
+				<include name="${src.dir}/**" />
+			</fileset>
+			<fileset dir=".">
+				<include name="${lib.dir}/**" />
+			</fileset>
+			<fileset dir=".">
+				<include name=".classpath" />
+				<include name=".project" />
+				<include name="ChangeLog.txt" />
+				<include name="build.bat" />
+				<include name="build.properties" />
+				<include name="build.xml" />
+			</fileset>
+		</jar>
+	</target>
+</project>
